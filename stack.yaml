@@ -37,9 +37,17 @@ resolver: nightly-2016-08-13
 # will not be run. This is useful for tweaking upstream packages.
 packages:
 - '.'
+- ../snowflake
 # Dependency packages to be pulled from upstream that are not in the resolver
 # (e.g., acme-missiles-0.3)
-extra-deps: []
+extra-deps:
+- aeson-1.0.0.0
+- binary-0.7.6.1
+- directory-1.2.7.0
+- time-1.5.0.1
+- time-exts-2.1.0
+- timezone-olson-0.1.7
+- timezone-series-0.1.5.1
 
 # Override default flag values for local packages and extra-deps
 flags: {}
