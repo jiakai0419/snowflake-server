@@ -18,39 +18,32 @@ import           Control.Monad.Trans (liftIO)
 import           Control.Concurrent.MVar (MVar, newMVar, putMVar, takeMVar, readMVar)
 
 
+type Pool = Map.Map Int64 (MVar IdWorker)
+
+workerIds = [0..2^(_workerIdBits defaultConf)-1]
+
 main :: IO ()
-main = quickHttpServe site
+main = do
+  pool <- Map.fromList . zip workerIds <$> mapM (\x -> newMVar $ IdWorker 0 x 0 0 defaultConf) workerIds
+  quickHttpServe $ site pool
 
-site :: Snap ()
-site =
-    ifTop (writeBS "Hello Snowflake") <|>
-    route [ ("get", getHandler) ]
-
-type Pool = Map.Map Int64 (IO (MVar IdWorker))
-
-pool :: Pool
-pool = Map.fromList . map (\x -> (x, newMVar $ IdWorker 0 x 0 0 defaultConf)) $ [0..2^(_workerIdBits defaultConf)-1]
+site :: Pool -> Snap ()
+site pool = ifTop (writeBS "Hello Snowflake") <|> route [ ("get", getHandler pool) ]
 
 snapshot :: Pool -> IO [(Int64, IdWorker)]
 snapshot = mapM snapshot' . Map.toList
-  where snapshot' (key, value) = do
-          mwk <- value
+  where snapshot' (idx, mwk) = do
           wk <- readMVar mwk
-          return (key, wk)
+          return (idx, wk)
 
 takeIdWorker :: Pool -> Int64 -> IO IdWorker
-takeIdWorker pool idx = do
-  mwk <- fromJust . Map.lookup idx $ pool
-  takeMVar mwk
+takeIdWorker pool idx = takeMVar . fromJust . Map.lookup idx $ pool
 
 putIdWorker :: Pool -> Int64 -> IdWorker -> IO ()
-putIdWorker pool idx worker = do
-  mwk <- fromJust . Map.lookup idx $ pool
-  putMVar mwk worker
+putIdWorker pool idx worker = let mwk = fromJust . Map.lookup idx $ pool in putMVar mwk worker
 
-
-getHandler :: Snap ()
-getHandler = do
+getHandler :: Pool -> Snap ()
+getHandler pool = do
   poolS <- liftIO $ snapshot pool
   writeBS $ B8.pack . (<> "\n") . show $ poolS
 
