@@ -1,12 +1,12 @@
 Name:                snowflake-server
-Version:             0.1
-Synopsis:            Project Synopsis Here
-Description:         Project Description Here
-License:             AllRightsReserved
-Author:              Author
-Maintainer:          maintainer@example.com
-Stability:           Experimental
-Category:            Web
+Version:             0.1.0.0
+Synopsis:            snowflake http server
+Description:         Please see README.md
+License:             BSD3
+license-file:        LICENSE
+Author:              KaiJia
+Maintainer:          jiakai0419@gmail.com
+Category:            commercial
 Build-type:          Simple
 Cabal-version:       >=1.2
 

@@ -37,7 +37,9 @@ resolver: nightly-2016-08-13
 # will not be run. This is useful for tweaking upstream packages.
 packages:
 - '.'
-- ../snowflake
+- location:
+    git: https://github.com/jiakai0419/snowflake.git
+    commit: 5547b103f31a164e4bd17e026c1884841c8dc724
 # Dependency packages to be pulled from upstream that are not in the resolver
 # (e.g., acme-missiles-0.3)
 extra-deps:
