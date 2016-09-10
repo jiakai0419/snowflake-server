@@ -1,3 +1,4 @@
 log
 .ghci
 .stack-work
+dist
